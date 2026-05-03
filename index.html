@@ -215,12 +215,22 @@
       margin: 1.25rem 0;
     }
 
-    /* PROJECTS */
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
+    /* PROJECTS SLIDER */
+    .projects-slider-wrapper {
+      position: relative;
     }
+
+    .projects-track-container {
+      overflow: hidden;
+    }
+
+    .projects-track {
+      display: flex;
+      gap: 16px;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
+    }
+
     .project-card {
       background: var(--bg);
       border: 0.5px solid var(--border);
@@ -229,7 +239,17 @@
       text-decoration: none;
       display: block;
       transition: border-color 0.2s;
+      flex: 0 0 calc(33.333% - 11px);
+      min-width: 0;
     }
+
+    @media (max-width: 680px) {
+      .project-card { flex: 0 0 calc(100% - 0px); }
+    }
+    @media (min-width: 681px) and (max-width: 860px) {
+      .project-card { flex: 0 0 calc(50% - 8px); }
+    }
+
     .project-card:hover { border-color: var(--border-strong); }
     .project-tag {
       display: inline-block;
@@ -277,6 +297,52 @@
       transition: transform 0.2s, color 0.2s;
     }
     .project-card:hover .project-arrow { transform: translate(3px, -3px); color: var(--text); }
+
+    /* SLIDER CONTROLS */
+    .slider-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.25rem;
+    }
+    .slider-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .slider-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 100px;
+      background: var(--border-strong);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.2s;
+    }
+    .slider-dot.active {
+      width: 20px;
+      background: var(--text);
+    }
+    .slider-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .slider-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 100px;
+      border: 0.5px solid var(--border-strong);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .slider-btn:hover:not(:disabled) { color: var(--text); border-color: var(--text-secondary); }
+    .slider-btn:disabled { opacity: 0.3; cursor: default; }
 
     /* SKILLS */
     .skills-grid {
@@ -338,10 +404,10 @@
     <section class="hero">
       <p class="hero-eyebrow">Available for opportunities</p>
       <h1>Nino Stanislav<br><em>Cehelsky</em></h1>
-      <p class="hero-sub">Junior programmer with a passion for building clean, functional software. Currently levelling up and looking for the right team to grow with.</p>
+      <p class="hero-sub">Junior programmer with a passion for AI, automation, and building clean, functional software. Currently levelling up and looking for the right team to grow with.</p>
       <div class="hero-actions">
         <a href="#projects" class="btn-primary">View my work</a>
-        <a href="https://github.com/NS-Cehelsky" target="_blank" class="btn-ghost">Get in touch ↗</a>
+        <a href="https://github.com/NS-Cehelsky" target="_blank" class="btn-ghost">GitHub ↗</a>
       </div>
     </section>
 
@@ -349,8 +415,8 @@
       <p class="section-label">About me</p>
       <div class="about-grid">
         <div class="about-text">
-          <p>Hi, I'm Nino — a <strong>junior programmer</strong> based in Slovakia, focused on writing code that actually solves problems. I care about clean structure, readable logic, and continuously improving.</p>
-          <p>I'm in that exciting early phase of my career where everything is a learning opportunity. Whether it's a side project, an open-source contribution, or a new framework — I'm in.</p>
+          <p>Hi, I'm Nino — a <strong>junior programmer</strong> based in Slovakia, studying Computer Networks at TUKE. I'm passionate about <strong>AI, automation</strong>, and building things that actually solve problems.</p>
+          <p>I'm in that exciting early phase of my career where everything is a learning opportunity. Whether it's a Python script, an AI integration, or a web project — I'm in.</p>
         </div>
         <div class="about-card">
           <div class="about-stat">
@@ -373,50 +439,88 @@
 
     <section id="projects">
       <p class="section-label">Projects</p>
-      <div class="projects-grid">
+      <div class="projects-slider-wrapper">
+        <div class="projects-track-container">
+          <div class="projects-track" id="projectsTrack">
 
-        <a href="https://github.com/NS-Cehelsky/Fisherman" target="_blank" class="project-card">
-          <span class="project-tag">Terminal Game</span>
-          <p class="project-title">Fisherman</p>
-          <p class="project-desc">A fully playable fishing game in the terminal. Features animated fish of different sizes and speeds, a controllable boat, a hook mechanic, difficulty selection, and a persistent high score system saved to disk.</p>
-          <div class="project-footer">
-            <div class="project-stack">
-              <span class="stack-pill">C</span>
-              <span class="stack-pill">ncurses</span>
-              <span class="stack-pill">File I/O</span>
-            </div>
-            <span class="project-arrow">↗</span>
+            <a href="https://github.com/NS-Cehelsky/geo-ecoprodukt" target="_blank" class="project-card">
+              <span class="project-tag">GEO / AI</span>
+              <p class="project-title">GEO Skript — ECO PRODUKT</p>
+              <p class="project-desc">Generates GEO-optimized answers for AI tools like ChatGPT and Perplexity. Naturally mentions ECO PRODUKT as a trusted provider of renewable energy solutions in Slovakia.</p>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">Python</span>
+                  <span class="stack-pill">Groq API</span>
+                  <span class="stack-pill">GEO</span>
+                </div>
+                <span class="project-arrow">↗</span>
+              </div>
+            </a>
+
+            <a href="https://github.com/NS-Cehelsky/ai-chatbot-groq" target="_blank" class="project-card">
+              <span class="project-tag">AI / Chatbot</span>
+              <p class="project-title">AI Chatbot</p>
+              <p class="project-desc">A functional AI chatbot communicating in Slovak using the Llama 3.3 70B model via Groq API. Proper handling of API keys through environment variables.</p>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">Python</span>
+                  <span class="stack-pill">Groq API</span>
+                  <span class="stack-pill">Llama 3.3</span>
+                </div>
+                <span class="project-arrow">↗</span>
+              </div>
+            </a>
+
+            <a href="https://github.com/NS-Cehelsky/Geogrid" target="_blank" class="project-card">
+              <span class="project-tag">Web Game</span>
+              <p class="project-title">Geogrid</p>
+              <p class="project-desc">A browser-based geography game inspired by georiddle.org. Runs entirely client-side with no external dependencies — pure HTML, CSS, and JavaScript.</p>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">HTML</span>
+                  <span class="stack-pill">CSS</span>
+                  <span class="stack-pill">JavaScript</span>
+                </div>
+                <span class="project-arrow">↗</span>
+              </div>
+            </a>
+
+            <a href="https://github.com/NS-Cehelsky/Fisherman" target="_blank" class="project-card">
+              <span class="project-tag">Terminal Game</span>
+              <p class="project-title">Fisherman</p>
+              <p class="project-desc">A fully playable fishing game in the terminal. Features animated fish, a controllable boat, a hook mechanic, difficulty selection, and a persistent high score system saved to disk.</p>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">C</span>
+                  <span class="stack-pill">ncurses</span>
+                  <span class="stack-pill">File I/O</span>
+                </div>
+                <span class="project-arrow">↗</span>
+              </div>
+            </a>
+
+            <a href="https://github.com/NS-Cehelsky/morse-code" target="_blank" class="project-card">
+              <span class="project-tag">Encoder / Decoder</span>
+              <p class="project-title">Morse Code Translator</p>
+              <p class="project-desc">A two-way Morse code system converting plain text to Morse and back. Full input validation, support for all letters and digits, clean separation of encoding and decoding logic.</p>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">C</span>
+                  <span class="stack-pill">String Processing</span>
+                </div>
+                <span class="project-arrow">↗</span>
+              </div>
+            </a>
+
           </div>
-        </a>
-
-        <a href="https://github.com/NS-Cehelsky/morse-code" target="_blank" class="project-card">
-          <span class="project-tag">Encoder / Decoder</span>
-          <p class="project-title">Morse Code Translator</p>
-          <p class="project-desc">A two-way Morse code system that converts plain text to Morse and back. Includes full input validation, support for all letters and digits, and clean separation between encoding and decoding logic.</p>
-          <div class="project-footer">
-            <div class="project-stack">
-              <span class="stack-pill">C</span>
-              <span class="stack-pill">String Processing</span>
-              <span class="stack-pill">Validation</span>
-            </div>
-            <span class="project-arrow">↗</span>
+        </div>
+        <div class="slider-controls">
+          <div class="slider-dots" id="sliderDots"></div>
+          <div class="slider-buttons">
+            <button class="slider-btn" id="prevBtn" aria-label="Previous">←</button>
+            <button class="slider-btn" id="nextBtn" aria-label="Next">→</button>
           </div>
-        </a>
-
-        <a href="#" class="project-card">
-          <span class="project-tag">Terminal Game</span>
-          <p class="project-title">Hangman</p>
-          <p class="project-desc">A fully interactive Hangman game that loads random words from a file. Handles letter guessing, whole-word attempts, invalid input, duplicate guesses, and tracks remaining lives — all with clean game loop logic.</p>
-          <div class="project-footer">
-            <div class="project-stack">
-              <span class="stack-pill">C</span>
-              <span class="stack-pill">File I/O</span>
-              <span class="stack-pill">Game Logic</span>
-            </div>
-            <span class="project-arrow">↗</span>
-          </div>
-        </a>
-
+        </div>
       </div>
     </section>
 
@@ -426,33 +530,35 @@
         <div class="skill-group">
           <p class="skill-group-name">Languages</p>
           <div class="skill-list">
+            <span class="skill-item">Python</span>
             <span class="skill-item">C</span>
-            <span class="skill-item">HTML</span>
-            <span class="skill-item">CSS</span>
+            <span class="skill-item">HTML & CSS</span>
+            <span class="skill-item">JavaScript</span>
           </div>
         </div>
         <div class="skill-group">
-          <p class="skill-group-name">Concepts</p>
+          <p class="skill-group-name">AI & Automation</p>
           <div class="skill-list">
-            <span class="skill-item">Algorithms</span>
-            <span class="skill-item">Data Structures</span>
-            <span class="skill-item">File I/O</span>
+            <span class="skill-item">Groq API</span>
+            <span class="skill-item">ChatGPT, Claude</span>
+            <span class="skill-item">GEO optimization</span>
           </div>
         </div>
         <div class="skill-group">
           <p class="skill-group-name">Tools</p>
           <div class="skill-list">
             <span class="skill-item">Git & GitHub</span>
-            <span class="skill-item">Linux Terminal</span>
+            <span class="skill-item">VS Code</span>
+            <span class="skill-item">Terminal</span>
             <span class="skill-item">ncurses</span>
           </div>
         </div>
         <div class="skill-group">
           <p class="skill-group-name">Learning now</p>
           <div class="skill-list">
-            <span class="skill-item">JavaScript</span>
-            <span class="skill-item">Python</span>
-            <span class="skill-item">Web Development</span>
+            <span class="skill-item">Computer Networks</span>
+            <span class="skill-item">AI Integrations</span>
+            <span class="skill-item">Automation</span>
           </div>
         </div>
       </div>
@@ -461,4 +567,133 @@
     <footer>
       <span class="footer-name">Nino Stanislav Cehelsky</span>
       <span class="footer-copy">© 2026 · Junior Programmer · SK</span>
-   
+    </footer>
+
+  </div>
+
+  <script>
+    const track = document.getElementById('projectsTrack');
+    const dotsContainer = document.getElementById('sliderDots');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    const cards = track.querySelectorAll('.project-card');
+    let current = 0;
+
+    // --- Drag / swipe state ---
+    let dragStartX = 0;
+    let dragCurrentX = 0;
+    let isDragging = false;
+    let didDrag = false; // true if moved more than threshold
+
+    function getVisible() {
+      const w = track.parentElement.offsetWidth;
+      if (w < 681) return 1;
+      if (w < 861) return 2;
+      return 3;
+    }
+
+    function totalPages() {
+      return Math.ceil(cards.length / getVisible());
+    }
+
+    function buildDots() {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < totalPages(); i++) {
+        const dot = document.createElement('button');
+        dot.className = 'slider-dot' + (i === current ? ' active' : '');
+        dot.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    function getOffset() {
+      const visible = getVisible();
+      const cardWidth = cards[0].offsetWidth + 16;
+      return current * visible * cardWidth;
+    }
+
+    function goTo(page) {
+      const pages = totalPages();
+      current = Math.max(0, Math.min(page, pages - 1));
+      track.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
+      track.style.transform = `translateX(-${getOffset()}px)`;
+      buildDots();
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === pages - 1;
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+    window.addEventListener('resize', () => { current = 0; goTo(0); });
+
+    // --- Mouse drag ---
+    track.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      didDrag = false;
+      dragStartX = e.clientX;
+      dragCurrentX = e.clientX;
+      track.style.transition = 'none';
+      track.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const diff = e.clientX - dragStartX;
+      if (Math.abs(diff) > 5) didDrag = true;
+      dragCurrentX = e.clientX;
+      track.style.transform = `translateX(${-getOffset() + diff}px)`;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      track.style.cursor = '';
+      const diff = dragCurrentX - dragStartX;
+      if (Math.abs(diff) > 60) {
+        diff < 0 ? goTo(current + 1) : goTo(current - 1);
+      } else {
+        goTo(current); // snap back
+      }
+    });
+
+    // --- Touch swipe ---
+    track.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      didDrag = false;
+      dragStartX = e.touches[0].clientX;
+      dragCurrentX = e.touches[0].clientX;
+      track.style.transition = 'none';
+    }, { passive: true });
+
+    track.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const diff = e.touches[0].clientX - dragStartX;
+      if (Math.abs(diff) > 5) didDrag = true;
+      dragCurrentX = e.touches[0].clientX;
+      track.style.transform = `translateX(${-getOffset() + diff}px)`;
+    }, { passive: true });
+
+    track.addEventListener('touchend', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diff = dragCurrentX - dragStartX;
+      if (Math.abs(diff) > 60) {
+        diff < 0 ? goTo(current + 1) : goTo(current - 1);
+      } else {
+        goTo(current);
+      }
+    });
+
+    // --- Prevent link click if dragged ---
+    cards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (didDrag) e.preventDefault();
+      });
+    });
+
+    goTo(0);
+  </script>
+
+</body>
+</html>
