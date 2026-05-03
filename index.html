@@ -576,15 +576,15 @@
     const dotsContainer = document.getElementById('sliderDots');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-
     const cards = track.querySelectorAll('.project-card');
-    let current = 0;
 
-    // --- Drag / swipe state ---
-    let dragStartX = 0;
-    let dragCurrentX = 0;
-    let isDragging = false;
-    let didDrag = false; // true if moved more than threshold
+    let current = 0;
+    let startX = 0;
+    let deltaX = 0;
+    let pointerDown = false;
+    let dragged = false;
+    const DRAG_THRESHOLD = 8;   // px — menej = citlivejší drag
+    const SWIPE_THRESHOLD = 50; // px — koľko treba potiahnuť pre zmenu stránky
 
     function getVisible() {
       const w = track.parentElement.offsetWidth;
@@ -597,6 +597,10 @@
       return Math.ceil(cards.length / getVisible());
     }
 
+    function getOffset() {
+      return current * getVisible() * (cards[0].offsetWidth + 16);
+    }
+
     function buildDots() {
       dotsContainer.innerHTML = '';
       for (let i = 0; i < totalPages(); i++) {
@@ -607,90 +611,69 @@
       }
     }
 
-    function getOffset() {
-      const visible = getVisible();
-      const cardWidth = cards[0].offsetWidth + 16;
-      return current * visible * cardWidth;
+    function goTo(page) {
+      current = Math.max(0, Math.min(page, totalPages() - 1));
+      track.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+      track.style.transform = `translateX(-${getOffset()}px)`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === totalPages() - 1;
+      buildDots();
     }
 
-    function goTo(page) {
-      const pages = totalPages();
-      current = Math.max(0, Math.min(page, pages - 1));
-      track.style.transition = 'transform 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
-      track.style.transform = `translateX(-${getOffset()}px)`;
-      buildDots();
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current === pages - 1;
+    function onStart(x) {
+      startX = x;
+      deltaX = 0;
+      dragged = false;
+      pointerDown = true;
+      track.style.transition = 'none';
+      container.style.cursor = 'grabbing';
     }
+
+    function onMove(x) {
+      if (!pointerDown) return;
+      deltaX = x - startX;
+      if (Math.abs(deltaX) > DRAG_THRESHOLD) dragged = true;
+      if (dragged) {
+        track.style.transform = `translateX(${-getOffset() + deltaX}px)`;
+      }
+    }
+
+    function onEnd() {
+      if (!pointerDown) return;
+      pointerDown = false;
+      container.style.cursor = 'grab';
+      if (dragged) {
+        if (deltaX < -SWIPE_THRESHOLD) goTo(current + 1);
+        else if (deltaX > SWIPE_THRESHOLD) goTo(current - 1);
+        else goTo(current); // snap späť
+      } else {
+        goTo(current); // len klik, žiadny pohyb
+      }
+    }
+
+    const container = track.parentElement;
+    container.style.cursor = 'grab';
+
+    // Mouse
+    container.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientX); });
+    window.addEventListener('mousemove', e => onMove(e.clientX));
+    window.addEventListener('mouseup', () => onEnd());
+
+    // Touch
+    container.addEventListener('touchstart', e => onStart(e.touches[0].clientX), { passive: true });
+    container.addEventListener('touchmove', e => onMove(e.touches[0].clientX), { passive: true });
+    container.addEventListener('touchend', () => onEnd());
+
+    // Klik na kartu — zablokuj ak sme ťahali
+    cards.forEach(card => {
+      card.addEventListener('click', e => {
+        if (dragged) e.preventDefault();
+      });
+    });
 
     prevBtn.addEventListener('click', () => goTo(current - 1));
     nextBtn.addEventListener('click', () => goTo(current + 1));
     window.addEventListener('resize', () => { current = 0; goTo(0); });
-
-    // --- Mouse drag ---
-    track.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      didDrag = false;
-      dragStartX = e.clientX;
-      dragCurrentX = e.clientX;
-      track.style.transition = 'none';
-      track.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const diff = e.clientX - dragStartX;
-      if (Math.abs(diff) > 5) didDrag = true;
-      dragCurrentX = e.clientX;
-      track.style.transform = `translateX(${-getOffset() + diff}px)`;
-    });
-
-    window.addEventListener('mouseup', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      track.style.cursor = '';
-      const diff = dragCurrentX - dragStartX;
-      if (Math.abs(diff) > 60) {
-        diff < 0 ? goTo(current + 1) : goTo(current - 1);
-      } else {
-        goTo(current); // snap back
-      }
-    });
-
-    // --- Touch swipe ---
-    track.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      didDrag = false;
-      dragStartX = e.touches[0].clientX;
-      dragCurrentX = e.touches[0].clientX;
-      track.style.transition = 'none';
-    }, { passive: true });
-
-    track.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const diff = e.touches[0].clientX - dragStartX;
-      if (Math.abs(diff) > 5) didDrag = true;
-      dragCurrentX = e.touches[0].clientX;
-      track.style.transform = `translateX(${-getOffset() + diff}px)`;
-    }, { passive: true });
-
-    track.addEventListener('touchend', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      const diff = dragCurrentX - dragStartX;
-      if (Math.abs(diff) > 60) {
-        diff < 0 ? goTo(current + 1) : goTo(current - 1);
-      } else {
-        goTo(current);
-      }
-    });
-
-    // --- Prevent link click if dragged ---
-    cards.forEach(card => {
-      card.addEventListener('click', (e) => {
-        if (didDrag) e.preventDefault();
-      });
-    });
 
     goTo(0);
   </script>
