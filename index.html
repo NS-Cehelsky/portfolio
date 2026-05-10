@@ -222,6 +222,8 @@
 
     .projects-track-container {
       overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .projects-track {
@@ -690,9 +692,20 @@
     const container = track.parentElement;
     container.style.cursor = 'grab';
 
-    container.addEventListener('mousedown', e => { onStart(e.clientX); });
-    window.addEventListener('mousemove', e => onMove(e.clientX));
-    window.addEventListener('mouseup', () => onEnd());
+    container.addEventListener('mousedown', e => {
+      if (e.target.tagName === 'BUTTON') return; // neber drag na tlačidlách
+      e.preventDefault();
+      onStart(e.clientX);
+    });
+    window.addEventListener('mousemove', e => {
+      if (!pointerDown) return;
+      e.preventDefault();
+      onMove(e.clientX);
+    });
+    window.addEventListener('mouseup', e => {
+      if (!pointerDown) return;
+      onEnd();
+    });
 
     container.addEventListener('touchstart', e => onStart(e.touches[0].clientX), { passive: true });
     container.addEventListener('touchmove', e => onMove(e.touches[0].clientX), { passive: true });
