@@ -687,7 +687,7 @@
     const container = track.parentElement;
     container.style.cursor = 'grab';
 
-    container.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientX); });
+    container.addEventListener('mousedown', e => { onStart(e.clientX); });
     window.addEventListener('mousemove', e => onMove(e.clientX));
     window.addEventListener('mouseup', () => onEnd());
 
