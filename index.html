@@ -397,9 +397,12 @@
       font-family: 'DM Mono', monospace;
       font-size: 12px;
       color: var(--text-secondary);
-      text-decoration: none;
+      background: none;
+      border: none;
+      cursor: pointer;
       letter-spacing: 0.02em;
       transition: color 0.2s;
+      padding: 0;
     }
     .footer-email:hover { color: var(--text); }
   </style>
@@ -423,7 +426,7 @@
       <div class="hero-actions">
         <a href="#projects" class="btn-primary">View my work</a>
         <a href="https://github.com/NS-Cehelsky" target="_blank" class="btn-ghost">GitHub ↗</a>
-        <a href="mailto:ns.cehelsky@gmail.com" class="btn-ghost">ns.cehelsky@gmail.com ↗</a>
+        <button class="btn-ghost" onclick="copyEmail(this)">ns.cehelsky@gmail.com</button>
       </div>
     </section>
 
@@ -597,7 +600,7 @@
     <footer>
       <span class="footer-name">Nino Stanislav Cehelsky</span>
       <div class="footer-right">
-        <a href="mailto:ns.cehelsky@gmail.com" class="footer-email">ns.cehelsky@gmail.com</a>
+        <button class="footer-email" onclick="copyEmail(this)">ns.cehelsky@gmail.com</button>
         <span class="footer-copy">© 2026 · Junior Programmer · SK</span>
       </div>
     </footer>
@@ -710,6 +713,14 @@
     window.addEventListener('resize', () => { current = 0; goTo(0); });
 
     goTo(0);
+
+    function copyEmail(btn) {
+      navigator.clipboard.writeText('ns.cehelsky@gmail.com').then(() => {
+        const original = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = original; }, 2000);
+      });
+    }
   </script>
 
 </body>
